@@ -86,6 +86,8 @@ jobs:
     services:
       oracle:
         image: ${{matrix.oracle-version}}
+        env:
+          ORACLE_PASSWORD: oracle
 #        credentials:
 #          username: ${{ secrets.DOCKER_USER }}
 #          password: ${{ secrets.DOCKER_PASSWORD }}
