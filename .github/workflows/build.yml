@@ -11,19 +11,19 @@ env:
   UT3_TESTER_HELPER: UT3_TESTER_HELPER
   UT3_TESTER_HELPER_PASSWORD: ut3
   UT3_TABLESPACE: users
-  BUILD_DIR: ${{env.GITHUB_WORKSPACE}}
-  JOB_ID: ${{env.GITHUB_RUN_ID}}
-  JOB_NUMBER: ${{env.GITHUB_RUN_NUMBER}}
-  PULL_REQUEST_NAME: ${env.GITHUB_HEAD_REF}
-  PULL_REQUEST_BRANCH: ${{env.GITHUB_HEAD_REF}}
+  BUILD_DIR: ${{github.workspace}}
+  JOB_ID: ${{github.run_id}}
+  JOB_NUMBER: ${{github.run_number}}
+  PULL_REQUEST_NAME: ${github.head_ref}
+  PULL_REQUEST_BRANCH: ${{github.head_ref}}
   TAG_NAME: ${TRAVIS_TAG}
   REPO_SLUG: ${TRAVIS_REPO_SLUG}
-  PR_SLUG: ${{env.GITHUB_REPOSITORY}}
+  PR_SLUG: ${{github.repository}}
   BRANCH_NAME: ${TRAVIS_BRANCH}
   # Environment for building a release
   CURRENT_BRANCH: ${TRAVIS_BRANCH}
   UTPLSQL_REPO: "utPLSQL/utPLSQL"
-  UTPLSQL_BUILD_NO: ${{env.GITHUB_RUN_ID}}
+  UTPLSQL_BUILD_NO: ${{github.run_id}}
   UTPLSQL_VERSION: $(. .travis/get_project_version.sh)
   UTPLSQL_BUILD_VERSION: $(. .travis/get_project_build_version.sh)
   UTPLSQL_SOURCES_DIR: 'source'
@@ -83,6 +83,9 @@ jobs:
     services:
       oracle:
         image: ${matrix.oracle-version}
+        credentials:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
         env:
           CONNECTION_STR: ${matrix.connection-str}
           ORACLE_PASSWORD: oracle
