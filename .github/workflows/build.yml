@@ -58,6 +58,7 @@ jobs:
       CONNECTION_STR: ${{matrix.connection-str}}
       ORACLE_PASSWORD: oracle
       DOCKER_VOLUME: ${{matrix.docker-volume}}
+      DOCKER_ENV: "-e SQLCLI=sqlplus -e UT3_DEVELOP_SCHEMA -e UT3_DEVELOP_SCHEMA_PASSWORD -e UT3_RELEASE_VERSION_SCHEMA -e UT3_RELEASE_VERSION_SCHEMA_PASSWORD -e UT3_USER -e UT3_USER_PASSWORD -e UT3_TESTER -e UT3_TESTER_PASSWORD -e UT3_TESTER_HELPER -e UT3_TESTER_HELPER_PASSWORD -e UT3_TABLESPACE -e ORACLE_PWD -e CONNECTION_STR -e UTPLSQL_DIR"
 
     runs-on: ubuntu-latest
     strategy:
@@ -114,10 +115,10 @@ jobs:
         run: chmod -R go+w ./{source,test,examples,${UTPLSQL_DIR}/source}
 
       - name: Install utPLSQL
-        run: docker run --rm -v $(pwd):/utPLSQL -w /utPLSQL --network host --entrypoint bash ${ORACLE_VERSION} .travis/install.sh
+        run: docker run --rm -v $(pwd):/utPLSQL -w /utPLSQL --network host --entrypoint ${DOCKER_ENV} bash ${ORACLE_VERSION} .travis/install.sh
 
       - name: Install utPLSQL release
-        run: docker run --rm -v $(pwd):/utPLSQL -w /utPLSQL --network host --entrypoint bash ${ORACLE_VERSION} ./.travis/install_utplsql_release.sh
+        run: docker run --rm -v $(pwd):/utPLSQL -w /utPLSQL --network host --entrypoint ${DOCKER_ENV} bash ${ORACLE_VERSION} ./.travis/install_utplsql_release.sh
 
 #
 #      - name: SonarCloud Scan
