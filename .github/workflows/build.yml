@@ -34,7 +34,6 @@ env:
   OJDBC_HOME: "${BUILD_DIR}/ojdbc"
   ORACLE_PWD: "oracle"
   DOCKHER_HUB_REPO: "utplsqlv3/oracledb"
-  DOCKER_VOLUME: "/home/oracle/host"
   DOCKER_ENV: "-e SQLCLI=sqlplus -e UT3_DEVELOP_SCHEMA -e UT3_DEVELOP_SCHEMA_PASSWORD -e UT3_RELEASE_VERSION_SCHEMA -e UT3_RELEASE_VERSION_SCHEMA_PASSWORD -e UT3_USER -e UT3_USER_PASSWORD -e UT3_TESTER -e UT3_TESTER_PASSWORD -e UT3_TESTER_HELPER -e UT3_TESTER_HELPER_PASSWORD -e UT3_TABLESPACE -e ORACLE_PWD -e CONNECTION_STR -e UTPLSQL_DIR"
   #utPLSQL released version directory
   UTPLSQL_DIR: "utPLSQL_latest_release"
@@ -57,8 +56,9 @@ jobs:
 
     env:
       UTPLSQL_VERSION: ${{matrix.utplsql-version}}
-      CONNECTION_STR: ${matrix.connection-str}
+      CONNECTION_STR: ${{matrix.connection-str}}
       ORACLE_PASSWORD: oracle
+      DOCKER_VOLUME: ${{matrix.docker-volume}}
 
     runs-on: ubuntu-latest
     strategy:
@@ -67,21 +67,18 @@ jobs:
         include:
           - oracle-version: "gvenzl/oracle-xe:11-slim"
             connection-str: '127.0.0.1:1521/XE'
-#            docker-options: '--shm-size=1g'
 #          - oracle-version: "utplsqlv3/oracledb:12c-r1-se2-small"
 #            connection-str: '127.0.0.1:1521/ORCLCDB'
 #          - oracle-version: "utplsqlv3/oracledb:12c-r2-se2-small"
 #            connection-str: '127.0.0.1:1521/ORCLCDB'
           - oracle-version: "gvenzl/oracle-xe:18-slim"
             connection-str: '127.0.0.1:1521/XE'
-            docker-options: '-e ORACLE_PASSWORD=oracle'
 #          - oracle-version: "utplsqlv3/oracledb:18c-se2-small"
 #            connection-str: '127.0.0.1:1521/ORCLCDB'
 #          - oracle-version: "utplsqlv3/oracledb:19c-se2-small"
 #            connection-str: '127.0.0.1:1521/ORCLCDB'
           - oracle-version: "gvenzl/oracle-xe:21-full"
             connection-str: '127.0.0.1:1521/XE'
-            docker-options: '-e ORACLE_PASSWORD=oracle'
 
     services:
       oracle:
@@ -98,30 +95,34 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 10
-          ${{matrix.docker-options}}
+          ${{env.DOCKER_ENV}}
 
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
-      - name: Install utPLSQL ${{matrix.utplsql-version}}
-        run: echo Installing ${UTPLSQL_VERSION} && sh ${{ github.workspace }}/scripts/1_install_utplsql.sh
+      - name: Update project version & build number
+        run:  sh ${{ github.workspace }}/.travis/update_project_version.sh
+
+      - name: Download latest utPLSQL release
+        run: git clone --depth=1 --branch=main https://github.com/utPLSQL/utPLSQL.git $UTPLSQL_DIR
 
       - name: Install utPLSQL-cli
         run: curl -Lk -o utPLSQL-cli.zip "https://github.com/utPLSQL/utPLSQL-cli/releases/download/v3.1.8/utPLSQL-cli.zip" && unzip utPLSQL-cli.zip && chmod -R u+x utPLSQL-cli
 
-      - name: Install demo project
-        run: sh ${{ github.workspace }}/scripts/2_install_demo_project.sh
+      - name: Update privileges on sources
+        run: chmod -R go+w ./{source,test,examples,${UTPLSQL_DIR}/source}
 
-      - name: Install unit tests
-        run: sh ${{ github.workspace }}/scripts/3_install_tests.sh
+      - name: Install utPLSQL
+        run: docker run --rm -v $(pwd):/utPLSQL -w /utPLSQL/source --network host --entrypoint bash $${matrix.oracle-version}} ./.travis/install.sh
 
-      - name: Run unit tests
-        run: sh ${{ github.workspace }}/scripts/4_run_tests.sh
+      - name: Install utPLSQL release
+        run: docker run --rm -v $(pwd):/utPLSQL -w /utPLSQL/source --network host --entrypoint bash $${matrix.oracle-version}} ./.travis/install_utplsql_release.sh
 
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#
+#      - name: SonarCloud Scan
+#        uses: SonarSource/sonarcloud-github-action@master
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
