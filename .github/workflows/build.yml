@@ -82,7 +82,7 @@ jobs:
 
     services:
       oracle:
-        image: ${matrix.oracle-version}
+        image: ${{matrix.oracle-version}}
 #        credentials:
 #          username: ${{ secrets.DOCKER_USER }}
 #          password: ${{ secrets.DOCKER_PASSWORD }}
