@@ -30,7 +30,7 @@ env:
   UTPLSQL_BUILD_USER_NAME: "Travis CI"
   CACHE_DIR: $HOME/.cache
   # Database Env
-  SQLCLI: "${BUILD_DIR}/sqlcl/bin/sql"
+  SQLCLI: "sqlplus"
   OJDBC_HOME: "${BUILD_DIR}/ojdbc"
   ORACLE_PWD: "oracle"
   DOCKHER_HUB_REPO: "utplsqlv3/oracledb"
@@ -76,8 +76,8 @@ jobs:
 #            connection-str: '127.0.0.1:1521/ORCLCDB'
 #          - oracle-version: "utplsqlv3/oracledb:19c-se2-small"
 #            connection-str: '127.0.0.1:1521/ORCLCDB'
-          - oracle-version: "gvenzl/oracle-xe:21-full"
-            connection-str: '127.0.0.1:1521/XE'
+#          - oracle-version: "gvenzl/oracle-xe:21-full"
+#            connection-str: '127.0.0.1:1521/XE'
 
     services:
       oracle:
