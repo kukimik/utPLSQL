@@ -57,6 +57,8 @@ jobs:
 
     env:
       UTPLSQL_VERSION: ${{matrix.utplsql-version}}
+      CONNECTION_STR: ${matrix.connection-str}
+      ORACLE_PASSWORD: oracle
 
     runs-on: ubuntu-latest
     strategy:
@@ -86,9 +88,6 @@ jobs:
 #        credentials:
 #          username: ${{ secrets.DOCKER_USER }}
 #          password: ${{ secrets.DOCKER_PASSWORD }}
-        env:
-          CONNECTION_STR: ${matrix.connection-str}
-          ORACLE_PASSWORD: oracle
         ports:
           - 1521:1521
         options: >-
@@ -96,7 +95,7 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 10
-          ${matrix.docker-options}
+          ${{matrix.docker-options}}
 
     steps:
       - uses: actions/checkout@v2
