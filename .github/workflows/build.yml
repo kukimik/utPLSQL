@@ -120,6 +120,16 @@ jobs:
       - name: Install utPLSQL release
         run: docker run --rm -v $(pwd):/utPLSQL -w /utPLSQL --network host --entrypoint bash ${DOCKER_ENV} ${ORACLE_VERSION} ./.travis/install_utplsql_release.sh
 
+      - name: Run Examples
+        run: docker run --rm -v $(pwd):/utPLSQL -w /utPLSQL --network host --entrypoint bash ${DOCKER_ENV} ${ORACLE_VERSION} ./.travis/run_examples.sh
+
+      - name: Install tests
+        run: docker run --rm -v $(pwd):/utPLSQL -w /utPLSQL --network host --entrypoint bash ${DOCKER_ENV} ${ORACLE_VERSION} ./test/install_tests.sh
+
+      - name: Run Tests
+        run: bash $(pwd)/test/run_tests.sh
+
+
 #
 #      - name: SonarCloud Scan
 #        uses: SonarSource/sonarcloud-github-action@master
