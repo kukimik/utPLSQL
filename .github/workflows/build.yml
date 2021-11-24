@@ -101,8 +101,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Update project version & build number
-        run:  sh ${{ github.workspace }}/.travis/update_project_version.sh
+#      - name: Update project version & build number
+#        run:  sh ${{ github.workspace }}/.travis/update_project_version.sh
 
       - name: Download latest utPLSQL release
         run: git clone --depth=1 --branch=main https://github.com/utPLSQL/utPLSQL.git $UTPLSQL_DIR
