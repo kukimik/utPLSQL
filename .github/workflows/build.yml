@@ -114,10 +114,10 @@ jobs:
         run: chmod -R go+w ./{source,test,examples,${UTPLSQL_DIR}/source}
 
       - name: Install utPLSQL
-        run: docker run --rm -v $(pwd):/utPLSQL -w /utPLSQL/source --network host --entrypoint bash ${ORACLE_VERSION} ./.travis/install.sh
+        run: docker run --rm -v $(pwd):/utPLSQL -w /utPLSQL --network host --entrypoint bash ${ORACLE_VERSION} ./.travis/install.sh
 
       - name: Install utPLSQL release
-        run: docker run --rm -v $(pwd):/utPLSQL -w /utPLSQL/source --network host --entrypoint bash ${ORACLE_VERSION} ./.travis/install_utplsql_release.sh
+        run: docker run --rm -v $(pwd):/utPLSQL -w /utPLSQL --network host --entrypoint bash ${ORACLE_VERSION} ./.travis/install_utplsql_release.sh
 
 #
 #      - name: SonarCloud Scan
